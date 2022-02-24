@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 21 21:33:05 2022
+Created on Wed Feb 23 15:15:21 2022
 
 @author: ethanmitten
 """
@@ -15,6 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 data1 = pd.read_csv('/Users/ethanmitten/Desktop/Data Analytics/March Madness/Data/TeamCurrent2022_Season.csv')
+overview_2022 = pd.read_csv('/Users/ethanmitten/Desktop/Data Analytics/March Madness/Data/MM_2022GrandOverview.csv')
 df_sos_2021 = pd.read_html('https://www.warrennolan.com/basketball/2021/sos-rpi')[0]
 
 df_sos_2021 = df_sos_2021.rename({'Team': 'School'}, axis=1)
@@ -22,6 +23,9 @@ df_sos_2021 = df_sos_2021.rename({'Team': 'School'}, axis=1)
 data2 = data1.merge(df_sos_2021, on='School', how='left')
 
 data = data2[["School", "Tm", "Opp", "SOS"]]
+
+#Normalize SRS
+overview_2022['SRS'] = (overview_2022['SRS'] - np.min(overview_2022['SRS']))/(np.max(overview_2022['SRS']) - np.min(overview_2022['SRS']))
 
 data.columns
 
@@ -40,9 +44,9 @@ def gameSim(team1, team2):
     xsdopp = x.Opp.std()
     ysdopp = y.Opp.std()
     Xscore = (rnd.gauss(xmeanpts,xsdpts) + rnd.gauss(ymeanopp, ysdopp))/2
-    xscore = Xscore * data['SOS'].mean()
+    xscore = Xscore * data['SOS'].mean() * overview_2022['SRS'].mean()
     Yscore = (rnd.gauss(ymeanpts,ysdpts) + rnd.gauss(xmeanopp, xsdopp))/2
-    yscore = Yscore * data['SOS'].mean()
+    yscore = Yscore * data['SOS'].mean() * overview_2022['SRS'].mean()
     if int(round(xscore)) > int(round(yscore)):
         return 1
     elif int(round(xscore)) < int(round(yscore)):
@@ -72,7 +76,7 @@ def gamesSim(team1,team2):
     
 data.School.unique()
 
-gamesSim('Missouri', "Saint John's")
+gamesSim('South Dakota State', "Nebraska")
 
 
 

@@ -24,7 +24,7 @@ seed_tms = pd.merge(df_s_2021, df_teams.loc[:,['TeamID','TeamName','tm_join']], 
 #df_elo_final = df_elo.loc[:,['Team','ELO']]
 #df_elo_final.head()
 
-df_elo_2021 = pd.read_html('https://www.warrennolan.com/basketball/2021/elo')[0]
+df_elo_2021 = pd.read_html('https://www.warrennolan.com/basketball/2020/sos')[0]
 
 df_elo_final_2021 = df_elo_2021.loc[:,['Team','ELO']]
 df_elo_final_2021.head()

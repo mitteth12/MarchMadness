@@ -1,0 +1,43 @@
+---
+title: "Untitled"
+author: "Ethan Mitten"
+date: "2/23/2022"
+output: html_document
+---
+
+```{r}
+data <- read.csv("~/Desktop/Data Analytics/March Madness/Data/MM_2022Overview.csv")
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+model <- lm(W ~.,data=data)
+summary(model)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

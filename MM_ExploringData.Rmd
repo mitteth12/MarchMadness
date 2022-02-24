@@ -1,0 +1,131 @@
+
+
+# 2021-2022 College Basketball Data Analysis & Visualization
+
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+```{r}
+#Count the number of distinct schools in the dataset
+n_distinct(Data$School)
+```
+
+There are 358 colleges in this dataset.
+
+```{r}
+#Highest win percentages
+data_new3 <- Data[order(Data$W.L., decreasing = TRUE), ]
+head(data_new3)
+```
+
+Looks like Murray State has the highest win eprcetnage of any team. Although they have the highest win percentage they have a lower strength of schedule. It then might be seem more impressive for Arizona, Auburn and Providence to be up there.
+
+```{r}
+#Highest total points for
+data_new4 <- Data[order(Data$Tm., decreasing = TRUE), ]
+head(data_new4)
+```
+
+We have a whole new set of teams for those that have the most total points in the season
+
+```{r}
+data_new5 <- Data[order(Data$Opp., decreasing = FALSE), ]
+head(data_new5)
+```
+
+These teams have given up the least amount of points this season. It can be seen that Wagner has a great record and gives up very few points.
+
+```{r}
+data_new6 <- Data[order(Data$FG., decreasing = TRUE), ]
+head(data_new6)
+```
+
+The best shooting teams all have very good records. Gonzaga, South Dakota State and Belmont have been seen in some of the other summary statistics we have seen thus far showing some consistency for these teams.
+
+```{r}
+data_new7 <- Data[order(Data$SOS, decreasing = TRUE), ]
+head(data_new7)
+```
+
+These are the teams taht have the toughest schedules. There is something to be said about Kansas given that they are 23-4 and have the third toughest schedule in the country.
+
+```{r}
+data_new8 <- Data[order(Data$FT., decreasing = TRUE), ]
+head(data_new8)
+```
+
+The teams with the highest free throw percentages do not seem to have much of a relation to any of the other statistics we have seen.
+
+```{r}
+#Get a very broad overview of numeric columns in dataset
+summary(Data)
+```
+
+Every team in this datset has won at least 2 games and there seem to be no undefeated teams as the minimum number of losses is also two. There is quite a big spread in the Tm. and Opp. columns that represent the amount of total points for and given up in the season. That is interesting considering that minutes played is fairly close together. It looks like every team shoots around 44% from the field with the max being 52.9% which is very good. There is also a team that is making 45% from the three point line which is very, very good. Team free throw percentages are lower than suspected with the maximum being 83%. If it is a cumulative of the whole team however it is hard to think that every player is shooting above 85% though.
+
+```{r}
+#Look at the teams with maximums in some of the categories
+Data[which.max(Data$FG.),]
+Data[which.max(Data$X3P.),]
+```
+
+Gonzaga has the best field goal percentage as well as the the best win percentage. South Dakota State has been very good at three point shooting this year being the team with the highest percentage.
+
+```{r}
+#Visualize Wins by Total Points Made
+ggplot(data = Data, aes(x = W, y = Tm.)) +
+  geom_point()
+```
+
+Generally, it looks like there is a positive correlation between wins and total points made which makes sense.
+
+```{r}
+#Wins vs. Strength of Schedule
+ggplot(data = Data, aes(x = W, y = SOS)) +
+  geom_point()
+```
+
+There does not seem to be a consistent trend for wins and strength of schedule.
+
+```{r}
+#Field goal percentage vs. Total points made
+ggplot(data = Data, aes(x = FG., y = Tm.)) +
+  geom_point()
+```
+
+There seems to be a high correlation between the field goal percentage of a team and the total points that they make.
+
+```{r}
+#Total points made vs. points given up
+ggplot(data = Data, aes(x = Tm., y = Opp.)) +
+  geom_point()
+```
+
+Interestingly, there seems to be a correlation between the amount of points made and the amount of points given up. There are not a whole lot of teams that score a whole lot of points and give up a lot of points or vice versa which is interesting. It makes me think of soccer where some teams tactics are to be a little more exposed on the defensive, but have the strategy that they might give up more goals, but they are banking on scoring more. In that case they would score a lot and give up a lot, but that theme is not seen for college basketball in this season at least.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
