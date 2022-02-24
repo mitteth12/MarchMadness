@@ -10,4 +10,6 @@ https://www.sports-reference.com/cbb/seasons/
 
 Other datasets and references that were used:
 https://www.warrennolan.com/basketball/2021/sos-rpi
+https://www.youtube.com/watch?v=irjTWNV0eAY&list=WL&index=1
+
 
