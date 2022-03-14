@@ -74,9 +74,10 @@ def gamesSim(team1,team2):
     #return gamesout
     
     
-data.School.unique()
+a = data.School.unique()
+print(sorted(a))
 
-gamesSim('South Dakota State', "Nebraska")
+gamesSim("Gonzaga", "Arizona")
 
 
 

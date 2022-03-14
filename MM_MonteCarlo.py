@@ -72,7 +72,7 @@ def gamesSim(team1,team2):
     
 data.School.unique()
 
-gamesSim('Missouri', "Saint John's")
+gamesSim("Houston", "Auburn")
 
 
 
