@@ -7,3 +7,9 @@ https://www.kaggle.com/c/mens-march-mania-2022/data
 
 I also used data from sports reference and the link is below:
 https://www.sports-reference.com/cbb/seasons/
+
+Other datasets and references that were used:
+https://www.warrennolan.com/basketball/2021/sos-rpi
+https://www.youtube.com/watch?v=irjTWNV0eAY&list=WL&index=1
+
+
