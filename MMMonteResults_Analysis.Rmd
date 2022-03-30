@@ -1,0 +1,156 @@
+---
+title: "March Madness Monte Carlo Results Analysis"
+output: pdf_document
+---
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(reshape2)
+```
+
+```{r}
+data <- read.csv("Desktop/Data Analytics/March Madness/Data/MMMonteResults.csv")
+```
+
+In the Right_Wrong column 1 means it was predicted correctly and 0 means it was predicted incorrectly.
+
+```{r}
+data %>%
+  group_by(Right_Wrong) %>%
+  summarise(n = n())
+```
+
+Out of the 38 matchups where both of the teams were correctly facing off against each other we were able to guess 24 of them correctly.
+
+
+```{r}
+print(24/38)
+```
+
+24 out of the 38 games is about 63%. Not terrible, but not great. What isn't accounted for however is the total number of guesses that could be made and the correct guesses. This is not in the data, but there were 29 correctly guessed lines where I picked the right team out of a total of 63 games to decide upon. That is a 46%, so less than half the time I had a correct team in a spot.
+
+```{r}
+W_Team_Unique <- data %>%
+  group_by(W_Team_Div) %>%
+  summarise(n = n()) %>% arrange(desc(n))
+
+W_Team_Unique
+```
+
+When I correctly had both the teams going head to head against each other the winning side was likely a power 5 conference side.
+
+```{r}
+L_Team_Unique <- data %>%
+  group_by(L_Team_Div) %>%
+  summarise(n = n()) %>% arrange(desc(n))
+
+L_Team_Unique
+```
+
+When I correctly had both the teams going head to head against each other the lossing side had quite a few power 5 conference teams as well. This would indicate that we have a lot of power 5 schools participating in the tournament. We are unable to see any outliers from the available information. Lets see how many total appearances were made from conferences in which I correctly had both of the teams playing each other.
+
+```{r}
+Total_Div_Appearances <- merge(W_Team_Unique, L_Team_Unique, by.x = "W_Team_Div", by.y = "L_Team_Div",all.x = TRUE,all.y = TRUE, sort = TRUE)
+```
+
+```{r}
+Total_Div_Appearances[is.na(Total_Div_Appearances)] <- 0
+```
+
+```{r}
+Total_Div_Appearances$Appearances <- Total_Div_Appearances$n.x + Total_Div_Appearances$n.y
+Total_Div_Appearances$Appearances <- as.numeric(Total_Div_Appearances$Appearances)
+
+Total_Div_Appearances$Wins <- Total_Div_Appearances$n.x
+Total_Div_Appearances$Losses <- Total_Div_Appearances$n.y
+```
+
+```{r}
+Total_Div_Appearances %>% filter(Appearances >= 2) %>% ggplot(aes(x=W_Team_Div,y=Appearances)) + geom_col(fill="darkblue") + labs(title = "Total Appearances by Conference in Dataset", y = "Number of Appearances", x="Conference") + scale_y_continuous(breaks=c(0,2,4,6,8))
+```
+
+It can be verifying that the top 5 most appearing sides in the games I had a chance to guess between were involving a power 5 conference school.
+
+```{r}
+dfm <- melt(Total_Div_Appearances[,c('W_Team_Div','Wins','Losses')],id.vars = 1)
+
+dfm %>% filter(value > 1) %>% ggplot(aes(x = W_Team_Div,y = value)) + 
+    geom_bar(aes(fill = variable),stat = "identity",position = "dodge") + 
+    scale_y_log10() + labs(title="Wins vs. Losses for Most Represented Conferences", y="Total Games", x="Conference")
+```
+
+Seeing how the top appearing schools looked in terms of wins and losses it seems pretty even. It looks like in the games I had a chance to guess the winner the big ten ended up with a few more winners than losers. The Mountain West on the other hand had a rough go securing three losses and no wins.
+
+```{r}
+data %>%
+  group_by(L_Seed) %>%
+  summarise(n = n()) %>% arrange(desc(n))
+```
+
+In the games I had both teams facing head to head it was seen that surprisingly the 6 seed lost the equally most times alongside the 8th seed.
+
+```{r}
+data %>%
+  group_by(W_Seed) %>%
+  summarise(n = n()) %>% arrange(desc(n))
+```
+
+The winning seeds were pretty expected besides the 9 seed having a stronger showing than the 8 seeds.
+
+```{r}
+data %>%
+  group_by(Location,W_Team_Div,W_Team) %>% select(Location,W_Team, W_Team_Div, W_Seed, Right_Wrong) %>% arrange(desc(Right_Wrong))
+```
+
+The important part of this analysis is understanding where my right and wrong guesses split. This information is very compact, so it is irrational to gather the whole conclusion from this set of data, but it would be interesting to understand a little bit of what happened before diving into more statistical data.
+
+```{r}
+data$Right_Wrong <- as.factor(data$Right_Wrong)
+levels(data$Right_Wrong) <- list(Wrong = "0", Right = "1")
+```
+
+
+```{r}
+data %>% ggplot() + geom_jitter(aes(x=W_Seed,y=L_Seed,color=Right_Wrong)) + geom_hline(yintercept = 8) + geom_vline(xintercept = 8)
+```
+
+The diagonal line are all of the games that were played in the first round. It is easier to see where the guesses went right and wrong by segmenting the graph. With high seed equaling a higher numbered seed, the upper left quartile are the games where the winning seed was low and the losing seed was high. Box 1 is where the correct guesses are as a low seed indicates a "better" team by the standards of the season. The upper right quartile would be where the winning teams had higher seeds and the losing teams had high seeds. This would only be likely if both teams won the first round. We only had a couple of matchups that met this criteria. The bottom left quartile we accurately guessed every game correctly which is where the winning team was a low seed and the losing team was a low seed. This would be an indicator that our model might work better for top 25 matchups than for picking cinderella teams in the tournament. The lower right quartile is the side where the cinderella teams would be on. These are the games where a high seed beat a low seed.   
+
+The most obvious trend to see is that the model did not predict any of the tougher to predict the games. The games where the odds were against the winning side. Most notably the most bottom left point was Saint Peters (15) defeating Kentucky (2). The reason why March Madness and bracket building is such a craze is how do you predict that happening?!
+
+```{r}
+data %>% ggplot() + geom_point(aes(x=W_Team_Div,y=W_Seed,color=Right_Wrong)) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + geom_hline(yintercept = 8)
+```
+
+It could be seen easily from the previous graph that the model did not do good in predicting the cinderella teams. These cinderella teams looked to come from interesting places. Some of these high seeds were from power conferences which is interesting. The Big 12 had two and the ACC had two.
+
+```{r}
+data %>% ggplot() + geom_point(aes(x=L_Team_Div,y=L_Seed,color=Right_Wrong)) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + geom_hline(yintercept = 8)
+```
+
+```{r}
+data %>% ggplot() + geom_point(aes(x=Location,y=W_Seed,color=Right_Wrong)) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + geom_hline(yintercept = 8)
+```
+
+It looks like it did not have a huge impact where the games were played. The distribution between right and wrongly selected games was most noticeable from the seed of the team.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
